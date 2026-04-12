@@ -11,7 +11,7 @@ export async function POST(req) {
 		messages: [
 			{
 				role: "system",
-				content: "You are a helpful assistant. Give short, clear answers. Avoid long explanations.",
+				content: "You are a helpful assistant. Give short, clear answers. Avoid long explanations.I will give you an conversation with you specified with user and assistant you get the info wat conversation is going on and then at end an query of user will be given generate output according to that",
 			},
 			{
 				role: "user",
