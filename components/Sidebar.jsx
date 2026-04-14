@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import ChatIcon from '@mui/icons-material/Chat';
 import Image from 'next/image';
 import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
 import HomeIcon from '@mui/icons-material/Home';
@@ -38,10 +39,38 @@ const sidebar = () => {
           </button>
         )
       }
+
+      {/* content */}
       {
         isVisible && (
-          <div className='flex flex-col gap-2 justify-between items-center transition-all duration-300 ease-in-out'>
-            sidebar
+          <div className='flex flex-col gap-2 justify-between transition-all duration-300 ease-in-out mt-4 p-2'>
+            {/* //options */}
+
+
+            <div className='flex flex-row gap-2 justify-between items-center'>
+              <button className='flex flex-row gap-2 justify-between items-center'>
+                <ChatIcon fontSize='small' className='text-gray-900 cursor-pointer' />
+                <span className='text-gray-900 cursor-pointer'>New Chat</span>
+              </button>
+            </div>
+
+            <h5 className='text-gray-400 text-center'>Recents</h5>
+
+            {/* recent chats  */}
+
+            {
+              [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item) => {
+                return (
+                  <div key={item} className='flex flex-row gap-2 justify-between items-center pt-1'>
+                    <button className='flex flex-row gap-2 justify-between items-center'>
+                      <ChatIcon fontSize='small' className='text-gray-900 cursor-pointer' />
+                      <span className='text-gray-900 cursor-pointer'>{item}</span>
+                    </button>
+                  </div>
+                )
+              })
+            }
+
           </div>
         )
       }
