@@ -35,17 +35,13 @@
 
 
 import dotenv from "dotenv";
-import OpenAI from "openai";
 dotenv.config();
+import { InferenceClient } from "@huggingface/inference";
 
-const client = new OpenAI({
-	baseURL: "https://router.huggingface.co/v1",
-	apiKey: process.env.HF_TOKEN,
-});
+const client = new InferenceClient(process.env.HF_TOKEN);
 
-
-const chatCompletion = await client.chat.completions.create({
-	model: "MiniMaxAI/MiniMax-M2.7:novita",
+const chatCompletion = await client.chatCompletion({
+	model: "zai-org/GLM-5.1:together",
 	messages: [
 		{
 			role: "user",

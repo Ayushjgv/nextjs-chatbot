@@ -35,6 +35,7 @@ const Chatscreen = () => {
         console.log(data);
       } catch (error) {
         console.log("Error sending message:", error);
+        setMessages((prev) => [...prev, { role: 'assistant', content: "something unexpected happend . or ran out of free credits" }]);
       }
 
     } else if (SelectedModel === 'groq') {
