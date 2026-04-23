@@ -8,7 +8,7 @@ import SendIcon from '@mui/icons-material/Send';
 
 const Chatscreen = () => {
 
-
+  const [SelectedModel, setSelectedModel] = useState('groq');
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
 
@@ -16,25 +16,80 @@ const Chatscreen = () => {
   const sendMessage = async () => {
     let messageToSend = [...messages, { role: "user", content: message.trim() }];
     let jsonstring = JSON.stringify(messageToSend);
-    console.log(messageToSend);
     if (message.trim() === "") return;
     setMessage("");
 
     setMessages((prev) => [...prev, { role: "user", content: message.trim() }]);
 
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        body: JSON.stringify({ message: jsonstring }),
-      });
 
-      const data = await res.json();
-      setMessages((prev) => [...prev, { role: "assistant", content: data }]);
-      console.log(data);
-    } catch (error) {
-      console.log("Error sending message:", error);
+    //all at once response
+    if (SelectedModel === 'other') {
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          body: JSON.stringify({ message: jsonstring }),
+        });
+
+        const data = await res.json();
+        setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+        console.log(data);
+      } catch (error) {
+        console.log("Error sending message:", error);
+      }
+
+    } else if (SelectedModel === 'groq') {
+
+      //groq api
+
+      try {
+        const res = await fetch('/api/chatStream', {
+          method: 'POST',
+          body: JSON.stringify({ message: jsonstring }),
+        });
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+
+        let done = false;
+        let fullResponse = "";
+
+        setMessages((prev) => [...prev, { role: "assistant", content: fullResponse }]);
+
+        while (!done) {
+          const { value, done: doneReading } = await reader.read();
+          done = doneReading;
+
+          if (value) {
+            const chunk = decoder.decode(value);
+            fullResponse += chunk;
+
+            setMessages((prev) => {
+              let messagescopy = [...prev];
+              messagescopy[messagescopy.length - 1] = {
+                ...messagescopy[messagescopy.length - 1],
+                content: fullResponse
+              };
+              return messagescopy;
+            });
+
+            console.log("Chunk:", chunk);
+          }
+        }
+
+        console.log("Stream finished");
+
+      } catch (error) {
+        console.log("Error sending message:", error);
+      }
+
     }
+
+
   }
+
+
+
+
 
 
   const handleSubmit = (e) => {
@@ -72,7 +127,7 @@ const Chatscreen = () => {
                 <ReactMarkdown>
                   {msg.role === "user"
                     ? msg.content
-                    : msg.content.reply}
+                    : (msg.content?.reply || msg.content)}
                 </ReactMarkdown>
               </p>
             </div>
@@ -82,14 +137,20 @@ const Chatscreen = () => {
 
       {/* Input field */}
 
-      <div className="mb-4 border gap-2 items-center justify-center w-4/5 rounded-4xl">
+      <div className="mb-4 border gap-2 flex items-center justify-center w-4/5 rounded-4xl">
+
+        <select name="models" id="models-select" className='border rounded-4xl p-1 mr-5' value={SelectedModel} onChange={(e) => setSelectedModel(e.target.value)}>
+          <option value="groq">Groq</option>
+          <option value="other">other</option>
+        </select>
+
         <form action="#"
           onSubmit={(e) => { handleSubmit(e) }}
           className="flex flex-row justify-center items-center gap-2"
         >
-          <div>
+          {/* <div>
             <button className="text-black px-4 py-2 rounded cursor-pointer"><ImageIcon /></button>
-          </div>
+          </div> */}
           <textarea
             value={message}
             onChange={(e) => {
