@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories'; // Added for a better empty state
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
 const PdfScreen = () => {
     const [Message, setMessage] = useState("");
@@ -12,6 +12,9 @@ const PdfScreen = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+
+        //gutenberd
+
         try {
             const res = await fetch('/api/Gutenberg', {
                 method: 'POST',
@@ -25,10 +28,35 @@ const PdfScreen = () => {
         } finally {
             setLoading(false);
         }
+
+        //google books
+
+        try {
+            
+            const res = await fetch('/api/GoogleBooks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: Message }),
+            });
+            const data = await res.json();
+
+            setBooks(prevBooks => [...prevBooks, ...data.books]);
+
+            console.log(data);
+
+        } catch (error) {
+            console.log(error);
+        }
+
+        
+
     };
 
+
+
+
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-gray-50 flex flex-col w-full">
 
             {/* Header / Search Area */}
             <div className="sticky top-0 z-10 bg-white shadow-sm p-6">
@@ -40,7 +68,7 @@ const PdfScreen = () => {
                         <input
                             type="text"
                             placeholder="Search by title or author (e.g., 'Sherlock Holmes')"
-                            className="w-full p-4 pr-16 rounded-xl border border-gray-200 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all shadow-inner"
+                            className="w-full p-4 pr-16 rounded-xl border border-gray-200 bg-gray-50 fo // Added for a better empty statecus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all shadow-inner"
                             value={Message}
                             onChange={(e) => setMessage(e.target.value)}
                         />
@@ -86,18 +114,34 @@ const PdfScreen = () => {
 
                                     {/* Action Links */}
                                     <div className="grid grid-cols-2 gap-2 mt-auto">
-                                        <a href={book.pdf} target="_blank" rel="noreferrer" className="flex justify-center py-2 px-3 bg-red-50 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-100 transition-colors">
-                                            PDF
-                                        </a>
-                                        <a href={book.epub} target="_blank" rel="noreferrer" className="flex justify-center py-2 px-3 bg-blue-50 text-blue-600 rounded-lg text-sm font-semibold hover:bg-blue-100 transition-colors">
-                                            EPUB
-                                        </a>
-                                        <a href={book.read} target="_blank" rel="noreferrer" className="flex justify-center py-2 px-3 bg-green-50 text-green-600 rounded-lg text-sm font-semibold hover:bg-green-100 transition-colors">
-                                            READ
-                                        </a>
-                                        <a href={book.bookPage} target="_blank" rel="noreferrer" className="flex justify-center py-2 px-3 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors">
-                                            DETAILS
-                                        </a>
+                                        {
+                                            book.pdf && (
+                                                <a href={book.pdf} target="_blank" rel="noreferrer" className="flex justify-center py-2 px-3 bg-red-50 text-red-600 rounded-lg text-sm font-semibold hover:bg-red-100 transition-colors">
+                                                    PDF
+                                                </a>
+                                            )
+                                        }
+                                        {
+                                            book.epub && (
+                                                <a href={book.epub} target="_blank" rel="noreferrer" className="flex justify-center py-2 px-3 bg-blue-50 text-blue-600 rounded-lg text-sm font-semibold hover:bg-blue-100 transition-colors">
+                                                    EPUB
+                                                </a>
+                                            )
+                                        }
+                                        {
+                                            book.read && (
+                                                <a href={book.read} target="_blank" rel="noreferrer" className="flex justify-center py-2 px-3 bg-green-50 text-green-600 rounded-lg text-sm font-semibold hover:bg-green-100 transition-colors">
+                                                    READ
+                                                </a>
+                                            )   
+                                        }
+                                        {
+                                            book.bookPage && (
+                                                <a href={book.bookPage} target="_blank" rel="noreferrer" className="flex justify-center py-2 px-3 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors">
+                                                    DETAILS
+                                                </a>
+                                            )
+                                        }
                                     </div>
                                 </div>
                             </div>

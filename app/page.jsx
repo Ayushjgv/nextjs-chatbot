@@ -2,24 +2,18 @@
 
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
-import Sidebar from "../components/Sidebar";
-import Chatscreen from "../components/Chatscreen";
+import Sidebar from "../pages/Sidebar";
+import Chatscreen from "../pages/Chatscreen";
+import { GlobalSelector } from "../context/GlobalVariable";
 
 const Page = () => {
 
-  const [SelectedWork, setSelectedWork] = useState('chat');
+  const { SelectedWork, SetSelectedWork } = GlobalSelector();
 
 
   return (
     <>
-      {/* topbar */}
-
-      < div className='mt-5 flex justify-center items-center absolute top-0 right-2' >
-        <select name="work" id="work" value={SelectedWork} onChange={(e) => setSelectedWork(e.target.value)}>
-          <option value="chat">Chat</option>
-          <option value="pdf">PDF</option>
-        </select>
-      </div >
+      
 
 
       <div className="flex h-screen w-full overflow-hidden">

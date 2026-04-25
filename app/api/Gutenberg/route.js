@@ -1,5 +1,5 @@
-import dotenv from 'dotenv';
-dotenv.config();
+// import dotenv from 'dotenv';
+// dotenv.config();
 
 
 // export async function POST(req) {
@@ -44,7 +44,6 @@ export async function POST(req) {
         );
 
         const data = await response.json();
-        console.log(data);
 
         const books = data.results.map(book => {
             const formats = book.formats;
