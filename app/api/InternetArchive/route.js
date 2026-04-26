@@ -1,47 +1,52 @@
-export async function searchArchive(query) {
-  const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(query)}&fl[]=identifier,title,creator&rows=10&page=1&output=json`;
+import { NextResponse } from "next/server";
+
+async function searchByName(query) {
+  const url = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(query)} AND mediatype:texts&fl[]=identifier,title,creator&rows=5&output=json`;
 
   const res = await fetch(url);
   const data = await res.json();
 
   return data.response.docs.map(book => ({
-    id: book.identifier,
+    id: book.identifier,   // 👈 THIS IS WHAT YOU NEED
     title: book.title,
     author: book.creator
   }));
 }
 
-searchArchive("sherlock holmes").then(books => {
-  console.log(books);
-});
-
-
-export async function getBookFiles(identifier) {
+async function getPDF(identifier) {
   const res = await fetch(`https://archive.org/metadata/${identifier}`);
   const data = await res.json();
 
-  const files = data.files;
+  const files = data.files || [];
 
-  const pdf = files.find(file => file.name.endsWith(".pdf"));
+  const pdfFile = files.find(f =>
+    f.name && f.name.toLowerCase().endsWith(".pdf")
+  );
 
-  return {
-    pdf: pdf ? `https://archive.org/download/${identifier}/${pdf.name}` : null
-  };
+  return pdfFile
+    ? `https://archive.org/download/${identifier}/${pdfFile.name}`
+    : null;
 }
 
-export async function getArchiveBooks(query) {
-  const books = await searchArchive(query);
+export async function POST(req) {
+  const { message } = await req.json();
+  const books = await searchByName(message);
 
   const results = await Promise.all(
     books.map(async (book) => {
-      const files = await getBookFiles(book.id);
+      const pdf = await getPDF(book.id);
 
       return {
         ...book,
-        pdf: files.pdf
+        pdf,
+        read: `https://archive.org/details/${book.id}`,
+        cover: `https://archive.org/services/img/${book.id}`
       };
     })
   );
 
-  return results;
+  return new Response(JSON.stringify({ books: results }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" }
+  });
 }

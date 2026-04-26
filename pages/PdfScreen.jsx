@@ -26,7 +26,7 @@ const PdfScreen = () => {
         } catch (error) {
             console.error(error);
         } finally {
-            setLoading(false);
+            // setLoading(false);
         }
 
         //google books
@@ -42,13 +42,29 @@ const PdfScreen = () => {
 
             setBooks(prevBooks => [...prevBooks, ...data.books]);
 
-            console.log(data);
+            // console.log(data);
 
         } catch (error) {
             console.log(error);
         }
 
-        
+        // internet archive  
+
+        try {
+            const res = await fetch('/api/InternetArchive', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: Message }),
+            });
+
+            const data = await res.json();
+            // console.log(data);
+            setBooks(prevBooks => [...prevBooks, ...data.books]);
+        } catch (error) {
+            console.log(error);
+        }finally{
+            setLoading(false);
+        } 
 
     };
 

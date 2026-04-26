@@ -130,6 +130,6 @@ async function searchBooksWithPDF(query) {
   return results;
 }
 
-searchBooksWithPDF("sherlock holmes").then(books => {
+searchBooksWithPDF("power").then(books => {
   console.log(books);
 });
