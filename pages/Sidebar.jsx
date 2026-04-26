@@ -66,7 +66,7 @@ const sidebar = () => {
                 hover:border-gray-400 transition-all duration-200"
               >
                 <option value="chat">💬 Chat</option>
-                <option value="pdf">📄 PDF</option>
+                <option value="pdf">📄 BOOK</option>
               </select>
 
               {/* Custom Arrow */}
