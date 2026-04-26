@@ -4,35 +4,18 @@ import React, { useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
+
+
 const PdfScreen = () => {
     const [Message, setMessage] = useState("");
     const [Books, setBooks] = useState([]);
     const [Loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+    //searching
 
-        //gutenberd
-
+    const searchGoogleBooks = async() => {
         try {
-            const res = await fetch('/api/Gutenberg', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: Message }),
-            });
-            const data = await res.json();
-            setBooks(data.books || []);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            // setLoading(false);
-        }
 
-        //google books
-
-        try {
-            
             const res = await fetch('/api/GoogleBooks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -47,9 +30,9 @@ const PdfScreen = () => {
         } catch (error) {
             console.log(error);
         }
+    }
 
-        // internet archive  
-
+    const searchInternetArchive = async() => {
         try {
             const res = await fetch('/api/InternetArchive', {
                 method: 'POST',
@@ -62,9 +45,69 @@ const PdfScreen = () => {
             setBooks(prevBooks => [...prevBooks, ...data.books]);
         } catch (error) {
             console.log(error);
+        } finally {
+            // setLoading(false);
+        }
+    }
+
+    const searchGutenberg = async() => {
+         try {
+            const res = await fetch('/api/Gutenberg', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: Message }),
+            });
+            const data = await res.json();
+            setBooks(data.books || []);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            // setLoading(false);
+        }
+    }
+
+    const searchWeb = async()=>{
+        try {
+            const res = await fetch("/api/webSearch", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ query: Message })
+            });
+
+            const data = await res.json();
+            console.log(data);
+            setBooks(prevBooks => [...prevBooks, ...data.results]);
+        } catch (error) {
+            console.log(error);
         }finally{
             setLoading(false);
-        } 
+        }
+    }
+
+    // handle submit 
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        //gutenberd
+
+       await searchGutenberg();
+
+        //google books
+
+        await searchGoogleBooks();
+
+        // internet archive  
+
+        await searchInternetArchive();
+
+        // websearch 
+        await searchWeb();
+        
 
     };
 
@@ -149,7 +192,7 @@ const PdfScreen = () => {
                                                 <a href={book.read} target="_blank" rel="noreferrer" className="flex justify-center py-2 px-3 bg-green-50 text-green-600 rounded-lg text-sm font-semibold hover:bg-green-100 transition-colors">
                                                     READ
                                                 </a>
-                                            )   
+                                            )
                                         }
                                         {
                                             book.bookPage && (
